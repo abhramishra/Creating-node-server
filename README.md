@@ -25,6 +25,7 @@ Notes for creating a simple node server
 
 4. Establish database connection
     * - npm install mongoose
+    * - create this folder structure config/database.js
     # DB Configuration
         const mongoose = require('mongoose')
         mongoose.connect('mongodb://localhost:27017/oct-weekend-notes-app', { useNewUrlParser: true, useUnifiedTopology: true }) 
@@ -36,7 +37,7 @@ Notes for creating a simple node server
             console.log(err)
         })
 
-5. Creating Schema
+5. Creating Schema  app/model/note.js
     # Creating Schema
         const Schema = mongoose.Schema
         const noteSchema = new Schema({
