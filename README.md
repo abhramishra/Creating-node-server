@@ -7,13 +7,13 @@ Notes for creating a simple node server
 2. npm install express
 
 3. create index.js
-// setup server using express
+# setup server using express
     const express = require('express')
     const app = express()
     const PORT = 3033
 
-    // REQUEST HANDLER
-        // app.httpMethod('url', callback function)
+    ## REQUEST HANDLER
+        ## app.httpMethod('url', callback function)
 
     app.get('/', (req,res) => {
         res.json({text : 'Welcome to the website'})
@@ -27,7 +27,7 @@ Notes for creating a simple node server
     a - npm install mongoose
     b - const mongoose = require('mongoose')
     c - 
-    // DB Configuration
+    # DB Configuration
     mongoose.connect('mongodb://localhost:27017/oct-weekend-notes-app', { useNewUrlParser: true, useUnifiedTopology: true })
         .then(() => {
             console.log('Connected to db')
@@ -37,7 +37,7 @@ Notes for creating a simple node server
         })
 
 5. Creating Schema
-    // Creating Schema
+    # Creating Schema
     const Schema = mongoose.Schema
     const noteSchema = new Schema({
         title: {
@@ -56,8 +56,8 @@ Notes for creating a simple node server
 
 6. Create note model
 
-    // Creating note Model
-    const Note = mongoose.model('Note',noteSchema )     // The model name should be singular and first letter should be capital 
+    # Creating note Model
+    const Note = mongoose.model('Note',noteSchema )     ## The model name should be singular and first letter should be capital 
     const note = new Note()
     console.log(note)
 
