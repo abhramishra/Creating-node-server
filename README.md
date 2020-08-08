@@ -1,4 +1,4 @@
-# Notes-app
+# Creating a simple node server
 Notes for creating a simple node server
 
 
@@ -24,11 +24,13 @@ Notes for creating a simple node server
     })
 
 4. Establish database connection
-    a - npm install mongoose
-    b - const mongoose = require('mongoose')
-    c - 
+    * - npm install mongoose
+    * - const mongoose = require('mongoose')
+    * - 
     # DB Configuration
-    mongoose.connect('mongodb://localhost:27017/oct-weekend-notes-app', { useNewUrlParser: true, useUnifiedTopology: true })
+    
+        mongoose.connect('mongodb://localhost:27017/oct-weekend-notes-app', { useNewUrlParser: true, useUnifiedTopology: true }) 
+    
         .then(() => {
             console.log('Connected to db')
         })
@@ -38,28 +40,28 @@ Notes for creating a simple node server
 
 5. Creating Schema
     # Creating Schema
-    const Schema = mongoose.Schema
-    const noteSchema = new Schema({
-        title: {
-            type: String,
-            required: true
-        },
-        body: {
-            type: String
-        },
-        createdAt: {
-            type: String,
-            required: true,
-            default: Date.now()
-        }
-    })
+        const Schema = mongoose.Schema
+        const noteSchema = new Schema({
+            title: {
+                type: String,
+                required: true
+            },
+            body: {
+                type: String
+            },
+            createdAt: {
+                type: String,
+                required: true,
+                default: Date.now()
+            }
+        })
 
 6. Create note model
 
     # Creating note Model
-    const Note = mongoose.model('Note',noteSchema )     ## The model name should be singular and first letter should be capital 
-    const note = new Note()
-    console.log(note)
+        const Note = mongoose.model('Note',noteSchema )     ## The model name should be singular and first letter should be capital 
+        const note = new Note()
+        console.log(note)
 
 7. ODM - Object Document Model
     * map a model to a collection
