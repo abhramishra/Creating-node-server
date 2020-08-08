@@ -1,0 +1,251 @@
+1. create config folder
+    / dayabase.js
+    / routes.js
+
+    +++++++++++++++++++++++++++++++++++++
+    inside database.js
+    +++++++++++++++++++++++++++++++++++++
+
+        const mongoose = require('mongoose')
+        const setupDB = () => {
+            mongoose.connect('mongodb://localhost:27017/oct-weekend-notes-app', { useNewUrlParser: true, useUnifiedTopology: true })
+                .then(() => {
+                    console.log('Connected to db')
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
+        module.exports = setupDB
+    
+    +++++++++++++++++++++++++++++++++++++
+    inside routes.js
+    +++++++++++++++++++++++++++++++++++++
+
+        const express = require('express')
+        const router = express.Router()
+        const categoriesController = require('../app/controllers/categoriesController')
+        const notesController = require('../app/controllers/notesController')
+        const tagsController = require('../app/controllers/tagsController')
+
+        router.get('/categories', categoriesController.list)
+        router.get('/categories/:id', categoriesController.show)
+        router.post('/categories', categoriesController.create)
+        router.put('/categories/:id', categoriesController.update)
+        router.delete('/categories/:id', categoriesController.delete)
+
+        router.get('/notes', notesController.list)
+        router.get('/notes/:id', notesController.show)
+        router.post('/notes', notesController.create)
+        router.put('/notes/:id', notesController.update)
+        router.delete('/notes/:id', notesController.delete)
+
+        router.get('/tags', tagsController.list)
+        router.post('/tags', tagsController.create)
+
+        module.exports = router
+
+
+2. create app 
+    / controllers
+        - categoriesController.js
+        - notesController.js
+    / models
+        - category.js
+        - note.js
+
+    +++++++++++++++++++++++++++++++++++++
+    /app/controllers/categoriesController.js
+    +++++++++++++++++++++++++++++++++++++
+
+        const Category = require('../models/category')
+        const Note = require('../models/note')
+
+        module.exports.list = (req,res) => {
+            Category.find()
+                .then((category) => {
+                    res.json(category)
+                })
+                .catch((err) => {
+                    res.json(err)
+                })
+        }
+
+        module.exports.create = (req,res) => {
+            const body = req.body
+            const category = new Category(body)
+            category.save()
+                .then((category) => {
+                    res.json(category)
+                })
+                .catch((err) => {
+                    res.json(err)
+                })
+        }
+
+        module.exports.show = (req,res) => {
+            const id = req.params.id
+            Promise.all([ Category.findById(id), Note.find({ category: id }) ])
+                .then(values => {
+                    [ category, notes ] = values
+                    const newCategory = category.toObject() // to convert it a regular object from mongoose object
+                    newCategory.notes = notes
+                    res.json(newCategory)
+                    // res.json({
+                    //     category,
+                    //     notes
+                    // })
+                })
+                .catch(err => {
+                    res.json(err)
+                }) 
+        }
+
+        module.exports.update = (req,res) => {
+            const id = req.params.id
+            const body = req.body
+            Category.findByIdAndUpdate(id, body, { new: true, runValidators: true })
+                .then((category) => {
+                    res.json(category)
+                })
+                .catch((err) => {
+                    res.json(err)
+                })
+        }
+
+        module.exports.delete = (req,res) => {
+            const id = req.params.id
+            Category.findByIdAndDelete(id)
+                .then((category) => {
+                    res.json(category)
+                })
+                .catch((err) => {
+                    res.json(err)
+                })
+        }
+
+    +++++++++++++++++++++++++++++++++++++
+    /app/models/category.js
+    +++++++++++++++++++++++++++++++++++++
+
+        const mongoose = require('mongoose')
+        const Schema = mongoose.Schema
+
+        // creating schema
+        const categorySchema = new Schema({
+            name: {
+                type: String,
+                required: true
+            },
+            body: {
+                type: String
+            },
+            createdAt: {
+                type: String,
+                required: true,
+                default: Date.now()
+            }
+        })
+        // creating model
+        const Category = mongoose.model('Category', categorySchema)
+
+        module.exports = Category
+
+
+    +++++++++++++++++++++++++++++++++++++
+    /app/controllers/notesController.js
+    +++++++++++++++++++++++++++++++++++++
+
+        const Note = require('../models/note')
+
+        module.exports.list = (req,res) => {
+            Note.find().populate('category')
+                .then(note => {
+                    res.json(note)
+                }) 
+                .catch(err => {
+                    res.json(err)
+                }) 
+        }
+
+        module.exports.create =(req,res) => {
+            const body = req.body
+            const note = new Note(body)
+            note.save()
+                .then(note => {
+                    res.json(note)
+                }) 
+                .catch(err => {
+                    res.json(err)
+                }) 
+        }
+
+        module.exports.show = (req,res) => {
+            const id = req.params.id
+            Note.findById(id).populate('category', ['name'])
+                .then((note) => {
+                    if (note) {
+                        res.json(note)
+                    } else {
+                        res.json({})
+                    }            
+                })
+                .catch((err) => {
+                    res.json(err)
+                })
+        }
+
+        module.exports.update = (req,res) => {
+            const id = req.params.id
+            const body = req.body
+            Note.findByIdAndUpdate(id, body, { new: true, runValidators: true })
+                .then((note) => {
+                    res.json(note)
+                })
+                .catch((err) => {
+                    res.json(err)
+                })
+        }
+
+        module.exports.delete = (req,res) => {
+            const id = req.params.id
+            Note.findByIdAndDelete(id)
+                .then((note) => {
+                    res.json(note)
+                })
+                .catch((err) => {
+                    res.json(err)
+                })
+        }
+
+    +++++++++++++++++++++++++++++++++++++
+    /app/models/note.js
+    +++++++++++++++++++++++++++++++++++++
+
+        const mongoose = require('mongoose')
+        const Schema = mongoose.Schema
+
+        // Creating Schema
+        const noteSchema = new Schema({
+            title: {
+                type: String,
+                required: true
+            },
+            body: {
+                type: String
+            },
+            createdAt: {
+                type: String,
+                required: true,
+                default: Date.now()
+            },
+            category: {
+                type: Schema.Types.ObjectId,
+                required: true,
+                ref: "Category"     // here "Category" is the model name (not the variable)
+            }
+        })
+        // Creating note Model
+        const Note = mongoose.model('Note', noteSchema)
+
+        module.exports = Note
