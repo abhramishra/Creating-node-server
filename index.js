@@ -7,9 +7,9 @@ const app = express()
 const PORT = 3033
 // to read the incooming data
 app.use(express.json())
+app.use(cors())
 
 app.use('/', routes)
-app.use(cors())
 
 app.get('/', (req,res) => {
     res.json({text : 'Welcome to the website'})
